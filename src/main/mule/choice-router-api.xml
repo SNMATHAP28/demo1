@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="affb0bf9-2845-4198-92d4-b125a114a4ba" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choice-router-apiFlow" doc:id="9a146d6f-ab26-4057-9451-0048235163ea" >
+		<http:listener doc:name="Listener" doc:id="e8d9c296-2fce-47e6-9766-ac6b609b8691" config-ref="HTTP_Listener_config" path="/choice"/>
+		<choice doc:name="Choice" doc:id="c3f0bd28-2838-4806-888e-660a9e8f2a0f" >
+			<when expression='#[payload.language=="Spanish"]'>
+				<ee:transform doc:name="Transform Message" doc:id="b4fc94fa-b5af-421f-a1bd-bc226d91528f">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/csv
+---
+{
+	"message": "hello"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="967da9e3-5142-45e1-868a-067bc3b41cc4" message="end1#[payload]" />
+			</when>
+			<when expression='#[payload.language=="Spanish"]'>
+				<ee:transform doc:name="Transform Message" doc:id="2dbe78c4-f071-417f-9831-b589908c1d2b">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "hola"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="b2f93538-f1c6-4d22-a13e-28f12f513fe6" message="end #[payload]" />
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="029a86a7-507f-4c33-abdf-74cb21e2d0a6" message='"condition is false"'/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
